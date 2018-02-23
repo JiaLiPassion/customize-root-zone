@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Simple Map</title>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta charset="utf-8">
+  <style>
+    /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+
+    #map {
+      height: 100%;
+    }
+
+    /* Optional: Makes the sample page fill the window. */
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <script type="text/javascript" src="https://unpkg.com/zone.js"></script>
+  <script type="text/javascript">
+    var mySpec = {
+      name: "GMAPS",
+      onScheduleTask: (delegate, current, target, task) => {
+        console.log('schedule task', task.source, Zone.current.name);
+        return delegate.scheduleTask(target, task);
+      },
+      onHasTask: (delegate, current, target, taskState) => {
+        console.log('hasTask: ', taskState);
+        return delegate.hasTask(target, taskState);
+      }
+    };
+    var mapZone = Zone.current.fork(mySpec);
+    var currentDescGet = Object.getOwnPropertyDescriptor(Zone, 'current').get;
+    var rootZone = Zone.root;
+    Object.defineProperty(Zone, 'current', {
+      configurable: true,
+      enumerable: true,
+      get: function() {
+        var currentZone = currentDescGet.apply(this, arguments); 
+        if (currentZone === rootZone) {
+          return mapZone;
+        }
+        return currentZone;
+      }
+    });
+  </script>
+  <script>
+      window["initMap"] = () => {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: { lat: -34.397, lng: 150.644 },
+          zoom: 8,
+          gestureHandling: 'greedy'
+        });
+
+        var marker = new google.maps.Marker({
+          position: { lat: -34.100, lng: 150.644 },
+          map: map,
+          title: 'Hello World!'
+        });
+
+        setTimeout(() => {
+          window.requestAnimationFrame(function () {
+            console.log('paint!');
+          });
+        }, 5000);
+      };
+  </script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script src="https://maps.googleapis.com/maps/api/js?key=&callback=initMap&sensor=true"
+    async defer></script>
+</body>
+
+</html>
