@@ -22,7 +22,7 @@
       padding: 0;
     }
   </style>
-  <script type="text/javascript" src="https://unpkg.com/zone.js"></script>
+  <script type="text/javascript" src="./node_modules/zone.js/dist/zone.js"></script>
   <script type="text/javascript">
     var mySpec = {
       name: "GMAPS",
@@ -36,20 +36,9 @@
       }
     };
     var mapZone = Zone.current.fork(mySpec);
-    var currentDescGet = Object.getOwnPropertyDescriptor(Zone, 'current').get;
-    var rootZone = Zone.root;
-    Object.defineProperty(Zone, 'current', {
-      configurable: true,
-      enumerable: true,
-      get: function() {
-        var currentZone = currentDescGet.apply(this, arguments); 
-        if (currentZone === rootZone) {
-          return mapZone;
-        }
-        return currentZone;
-      }
-    });
+    window.__zone_symbol__customizeRootZone = mapZone;
   </script>
+  <script type="text/javascript" src="./node_modules/zone.js/dist/zone-patch-customize-root.js"></script>
   <script>
       window["initMap"] = () => {
         map = new google.maps.Map(document.getElementById('map'), {
